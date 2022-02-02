@@ -1,0 +1,57 @@
+{
+  "name": "xp-cristin",
+  "version": "1.0.0",
+  "description": "Imports data from Cristin to local repos",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build:client": "webpack --config webpack.client.config.js --color",
+    "build:server": "webpack --config webpack.server.config.js --color",
+    "build": "run-p -c build:*",
+    "dist:client": "cross-env NODE_ENV=production webpack --config webpack.client.config.js --color",
+    "dist:server": "cross-env NODE_ENV=production webpack --config webpack.server.config.js --color --hide-modules",
+    "dist": "run-p -c dist:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/register": "^7.17.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "autoprefixer": "^10.4.2",
+    "babel-loader": "^8.2.3",
+    "browserslist-config-enonic": "^1.0.6",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.6.0",
+    "cssnano": "^5.0.17",
+    "enonic-types": "file:/home/tomaj/code/item/enonic-types/enonic-types-0.3.18-5.tgz",
+    "eslint": "^8.9.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "file-loader": "^6.2.0",
+    "glob": "^7.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.5.3",
+    "node-sass": "^7.0.1",
+    "postcss": "^8.4.6",
+    "postcss-loader": "^6.2.1",
+    "postcss-normalize": "^10.0.1",
+    "prettier": "^2.5.1",
+    "ramda": "^0.28.0",
+    "sass-loader": "^12.6.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "browserslist": [
+    "extends browserslist-config-enonic"
+  ],
+  "engines": {
+    "node": ">= 16.0.0",
+    "npm": ">= 7.10.0"
+  }
+}

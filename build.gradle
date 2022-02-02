@@ -1,0 +1,102 @@
+plugins {
+  id 'java'
+  id "com.github.node-gradle.node" version '3.1.1'
+  id 'com.enonic.xp.app' version '3.1.0'
+  id 'no.item.xp.codegen' version '1.1.9'
+}
+
+app {
+  name = "${appName}"
+  displayName = "${appDisplayName}"
+  vendorName = "${vendorName}"
+  vendorUrl = "${vendorUrl}"
+  systemVersion = "${xpVersion}"
+}
+
+dependencies {
+  //implementation "com.enonic.xp:script-api:${xpVersion}"
+  include "com.enonic.xp:lib-event:${xpVersion}"
+  include "com.enonic.xp:lib-repo:${xpVersion}"
+  include "com.enonic.xp:lib-node:${xpVersion}"
+  include "com.enonic.xp:lib-value:${xpVersion}"
+  include "com.enonic.xp:lib-context:${xpVersion}"
+  include "com.enonic.xp:lib-portal:${xpVersion}"
+  include "com.enonic.xp:lib-task:${xpVersion}"
+  include "com.enonic.xp:lib-scheduler:${xpVersion}"
+  include "com.enonic.lib:lib-http-client:2.4.0"
+  include "no.item:lib-xp-cristin:1.0.0"
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  xp.enonicRepo()
+  maven { url 'https://jitpack.io' }
+}
+
+node {
+  download = true
+  version = '16.0.0'
+}
+
+task npmInstallForce(type: NpmTask) {
+  description = 'Update all project node dependencies'
+  args = ['install', '--force']
+}
+
+task cleanNode(type: org.gradle.api.tasks.Delete) {
+  delete 'node_modules'
+}
+
+task clientWebpack(type: NodeTask, dependsOn: npmInstall) {
+  environment = ['NODE_ENV': nodeEnvironment()]
+  args = ['--config', 'webpack.client.config.js', '--color']
+  description = 'Build UI resources (js, css, etc).'
+  inputs.dir 'src/main'
+  outputs.dir "${buildDir}/resources/main"
+  script = file('node_modules/webpack-cli/bin/cli.js')
+}
+
+task serverWebpack(type: NodeTask, dependsOn: npmInstall) {
+  environment = ['NODE_ENV': nodeEnvironment()]
+  // args = [ '--config', 'webpack.server.config.babel.js', '--color', '--hide-modules' ]
+  args = ['--config', 'webpack.server.config.js', '--color']
+  description = 'Build server JS.'
+  inputs.dir 'src/main'
+  outputs.dir "${buildDir}/resources/main"
+  script = file('node_modules/webpack-cli/bin/cli.js')
+}
+
+processResources {
+  include '**/*'
+  exclude '**/.gitkeep'
+  exclude '**/tsconfig.*.json'
+  exclude '**/*.es'
+  exclude '**/*.es6'
+  exclude '**/*.ts'
+  exclude 'assets/js/**/*.js'
+  include 'assets/js/bundle.js'
+  exclude 'assets/styles/**/*.less'
+  exclude 'assets/styles/**/*.sass'
+  exclude 'assets/styles/**/*.scss'
+  includeEmptyDirs false
+}
+
+jar {
+  exclude 'assets/styles/**/*.less'
+  exclude 'assets/styles/**/*.sass'
+  exclude 'assets/styles/**/*.scss'
+  exclude 'assets/styles/**/*.js'
+
+  dependsOn += generateTypeScriptDeclaration
+  dependsOn += clientWebpack
+  dependsOn += serverWebpack
+}
+
+jar.outputs.dir "${buildDir}/resources/main"
+
+def nodeEnvironment() {
+  def environments = [prod: 'production', dev: 'development']
+  def nodeEnv = environments[hasProperty('env') ? env : 'prod']
+  return nodeEnv != null ? nodeEnv : 'production'
+}
