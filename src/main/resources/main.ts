@@ -1,3 +1,4 @@
+import { submitTask } from "/lib/xp/task";
 import { create, modify, get, type CreateScheduledJobParams, type ScheduledJob } from "/lib/xp/scheduler";
 import {
   REPO_CRISTIN_PERSONS,
@@ -9,12 +10,13 @@ import {
 import { runAsSu } from "/lib/cristin-app/contexts";
 import { getOrCreateRepoConnection } from "/lib/cristin-app/repos";
 import type { UpdateCristinRepoConfig } from "./tasks/update-cristin-repo/update-cristin-repo-config";
+import { create as createRepo, get as getRepo } from "/lib/xp/repo";
+import { ImportCristinResultRepoConfig } from "./tasks/import-cristin-result-repo/import-cristin-result-repo-config";
 
 runAsSu(() => {
   // ensure repos exist
   getOrCreateRepoConnection(REPO_CRISTIN_PERSONS);
   getOrCreateRepoConnection(REPO_CRISTIN_PROJECTS);
-  getOrCreateRepoConnection(REPO_CRISTIN_RESULTS);
   getOrCreateRepoConnection(REPO_CRISTIN_INSTITUTIONS);
   getOrCreateRepoConnection(REPO_CRISTIN_UNITS);
 
@@ -52,17 +54,40 @@ runAsSu(() => {
       },
       cron: "0 2 * * *", // 02:00
     },
-    {
-      name: "import-results",
-      enabled: true,
-      config: {
-        repo: REPO_CRISTIN_RESULTS,
-      },
-      cron: "30 2 * * *", // 02:30
-    },
   ];
 
   jobs.forEach(setupJob);
+
+  // update results
+  if (app.config.institution) {
+    upsertScheduledJob({
+      name: "import-cristin-result-repo",
+      enabled: true,
+      config: {
+        institution: app.config.institution,
+      },
+      description: `Importing cristin`,
+      descriptor: "no.item.cristin:import-cristin-result-repo",
+      schedule: {
+        type: "CRON",
+        value: "30 2 * * *", // 02:30
+        timeZone: "GMT+1:00",
+      },
+      user: "user:system:su",
+    });
+
+    // If no repo, create it and run import task
+    if (getRepo(REPO_CRISTIN_RESULTS) === null) {
+      createRepo({ id: REPO_CRISTIN_RESULTS });
+
+      submitTask<ImportCristinResultRepoConfig>({
+        descriptor: "no.item.cristin:import-cristin-result-repo",
+        config: {
+          institution: app.config.institution,
+        },
+      });
+    }
+  }
 });
 
 function setupJob(params: SetupJobParams): void {

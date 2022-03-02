@@ -1,0 +1,9 @@
+<task>
+  <description>Import Results (publications) to local repo</description>
+  <form>
+    <input name="institution" type="TextLine">
+      <label>Institution</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+  </form>
+</task>

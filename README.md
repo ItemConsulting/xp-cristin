@@ -1,13 +1,15 @@
 # Cristin integration for XP
 
-This library schedules tasks every night at 01:00, that reads from  the [Cristin APIs](https://api.cristin.no/v2/doc/index.html)
+This library schedules tasks every night, that reads from  the [Cristin APIs](https://api.cristin.no/v2/doc/index.html)
 and creates or updates data for an organization in custom repos.
 
 The shape is not changed from the original ones in Cristin.
 
 The follow repos are created:
  - `"no.item.cristin.persons"`
+ - `"no.item.cristin.institutions"`
  - `"no.item.cristin.projects"`
+ - `"no.item.cristin.units"`
  - `"no.item.cristin.results"`
 
 ## Configuration
