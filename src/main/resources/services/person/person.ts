@@ -1,16 +1,8 @@
-import { getCristinPersons, ListOfPersons, Person, Unarray } from "/lib/cristin";
+import { getCristinPersons, type Person } from "/lib/cristin";
 import { fetchPersons } from "/lib/cristin/service";
 import { lookupPerson } from "/lib/cristin/storage";
 import { arrayToRecord, forceArray, notNullOrUndefined } from "/lib/cristin-app/utils";
 import { getCristinPagination, isNumber } from "/lib/cristin-app/custom-selectors";
-
-function getPosition(person?: Person, institution?: string): string | undefined {
-  return forceArray(person?.affiliations)
-    .filter((affiliation) => {
-      return institution === undefined || affiliation.institution?.cristin_institution_id === institution;
-    })
-    .map((affiliation) => affiliation.position?.en ?? affiliation.position?.nb)[0];
-}
 
 export function get(req: XP.CustomSelectorServiceRequest): XP.CustomSelectorServiceResponse {
   if (req.params.ids) {
@@ -66,4 +58,12 @@ export function get(req: XP.CustomSelectorServiceRequest): XP.CustomSelectorServ
       }),
     },
   };
+}
+
+function getPosition(person?: Person, institution?: string): string | undefined {
+  return forceArray(person?.affiliations)
+    .filter((affiliation) => {
+      return institution === undefined || affiliation.institution?.cristin_institution_id === institution;
+    })
+    .map((affiliation) => affiliation.position?.en ?? affiliation.position?.nb)[0];
 }

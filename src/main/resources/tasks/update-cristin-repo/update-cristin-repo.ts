@@ -5,13 +5,13 @@ import {
   REPO_CRISTIN_UNITS,
   REPO_CRISTIN_INSTITUTIONS,
 } from "/lib/cristin/constants";
-import { getOrCreateRepoConnection } from "/lib/cristin-app/repos";
 import { fetchPerson, fetchInstitution, fetchUnit, fetchProject, fetchResult } from "/lib/cristin/service";
-import { RepoConnection, RepoNode } from "/lib/xp/node";
+import { connect, type RepoConnection, type RepoNode } from "/lib/xp/node";
 import { progress } from "/lib/xp/task";
 import type { Person, Result, Project, Unit, Institution } from "/lib/cristin";
 import type { UpdateCristinRepoConfig } from "./update-cristin-repo-config";
 import type { CristinNode } from "/lib/cristin/utils/repos";
+import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
 
 type CristinRepo =
   | typeof REPO_CRISTIN_PERSONS
@@ -38,7 +38,10 @@ export function run<
 >({ repo }: { repo: Repo }): void {
   log.info(`Start updating repo "${repo}"`);
 
-  const connection = getOrCreateRepoConnection(repo);
+  const connection = connect({
+    repoId: repo,
+    branch: BRANCH_MASTER,
+  });
   const nodes = getAllEntriesFromRepo<Data>(connection);
 
   const [changed, unchanged] = nodes.reduce<UpdateResult>((counter, cristinNode, current) => {

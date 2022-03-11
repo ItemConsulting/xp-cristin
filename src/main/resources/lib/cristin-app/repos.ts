@@ -1,7 +1,7 @@
-import { get as getRepo, create as createRepo } from "/lib/xp/repo";
 import { connect, type RepoConnection, type NodeQueryHit } from "/lib/xp/node";
-import { type ProgressParams } from "/lib/xp/task";
-import { type Unarray } from "enonic-types/types";
+import type { ProgressParams } from "/lib/xp/task";
+import type { Unarray } from "enonic-types/types";
+import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
 
 export type UpsertResult = [created: number, modified: number, unchanged: number, error: number];
 
@@ -32,7 +32,10 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   fetchOne,
   progress,
 }: ImportToRepoParams<DataList, DataSingle>): void {
-  const connection = getOrCreateRepoConnection(repoName);
+  const connection = connect({
+    repoId: repoName,
+    branch: BRANCH_MASTER,
+  });
 
   try {
     const [created, modified, unchanged, errors] = fetchList()
@@ -65,21 +68,6 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   } catch (e) {
     log.error(String(e));
   }
-}
-
-export function getOrCreateRepoConnection(repoName: string): RepoConnection {
-  let repo = getRepo(repoName);
-
-  if (repo === null) {
-    repo = createRepo({
-      id: repoName,
-    });
-  }
-
-  return connect({
-    repoId: repo.id,
-    branch: "master",
-  });
 }
 
 function upsert<Data>(connection: RepoConnection, cristinNode: CristinNode<Data>): UpsertResult {

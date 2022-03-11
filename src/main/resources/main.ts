@@ -7,18 +7,17 @@ import {
   REPO_CRISTIN_INSTITUTIONS,
   REPO_CRISTIN_UNITS,
 } from "/lib/cristin/constants";
+import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
-import { getOrCreateRepoConnection } from "/lib/cristin-app/repos";
 import type { UpdateCristinRepoConfig } from "./tasks/update-cristin-repo/update-cristin-repo-config";
-import { create as createRepo, get as getRepo } from "/lib/xp/repo";
 import { ImportCristinResultRepoConfig } from "./tasks/import-cristin-result-repo/import-cristin-result-repo-config";
 
 runAsSu(() => {
   // ensure repos exist
-  getOrCreateRepoConnection(REPO_CRISTIN_PERSONS);
-  getOrCreateRepoConnection(REPO_CRISTIN_PROJECTS);
-  getOrCreateRepoConnection(REPO_CRISTIN_INSTITUTIONS);
-  getOrCreateRepoConnection(REPO_CRISTIN_UNITS);
+  ensureRepoExist(REPO_CRISTIN_PERSONS);
+  ensureRepoExist(REPO_CRISTIN_PROJECTS);
+  ensureRepoExist(REPO_CRISTIN_INSTITUTIONS);
+  ensureRepoExist(REPO_CRISTIN_UNITS);
 
   // Setup nightly import jobs
   const jobs: Array<SetupJobParams> = [
@@ -77,9 +76,9 @@ runAsSu(() => {
     });
 
     // If no repo, create it and run import task
-    if (getRepo(REPO_CRISTIN_RESULTS) === null) {
-      createRepo({ id: REPO_CRISTIN_RESULTS });
+    const resultsRepoExisted = ensureRepoExist(REPO_CRISTIN_RESULTS);
 
+    if (!resultsRepoExisted) {
       submitTask<ImportCristinResultRepoConfig>({
         descriptor: "no.item.cristin:import-cristin-result-repo",
         config: {
