@@ -23,7 +23,7 @@ dependencies {
   include "com.enonic.xp:lib-portal:${xpVersion}"
   include "com.enonic.xp:lib-task:${xpVersion}"
   include "com.enonic.xp:lib-scheduler:${xpVersion}"
-  include "com.enonic.lib:lib-http-client:2.4.0"
+  include "com.enonic.lib:lib-http-client:2.4.1"
   include "no.item:lib-xp-cristin:1.0.2"
 }
 
