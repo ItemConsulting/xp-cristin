@@ -4,6 +4,7 @@ import {
   REPO_CRISTIN_PERSONS,
   REPO_CRISTIN_PROJECTS,
   REPO_CRISTIN_RESULTS,
+  REPO_CRISTIN_RESULT_CONTRIBUTORS,
   REPO_CRISTIN_INSTITUTIONS,
   REPO_CRISTIN_UNITS,
 } from "/lib/cristin/constants";
@@ -18,6 +19,7 @@ runAsSu(() => {
   ensureRepoExist(REPO_CRISTIN_PROJECTS);
   ensureRepoExist(REPO_CRISTIN_INSTITUTIONS);
   ensureRepoExist(REPO_CRISTIN_UNITS);
+  ensureRepoExist(REPO_CRISTIN_RESULT_CONTRIBUTORS);
 
   // Setup nightly import jobs
   const jobs: Array<SetupJobParams> = [
