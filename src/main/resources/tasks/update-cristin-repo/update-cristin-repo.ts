@@ -4,11 +4,19 @@ import {
   REPO_CRISTIN_PROJECTS,
   REPO_CRISTIN_UNITS,
   REPO_CRISTIN_INSTITUTIONS,
+  REPO_CRISTIN_RESULT_CONTRIBUTORS,
 } from "/lib/cristin/constants";
-import { fetchPerson, fetchInstitution, fetchUnit, fetchProject, fetchResult } from "/lib/cristin/service";
+import {
+  fetchPerson,
+  fetchInstitution,
+  fetchUnit,
+  fetchProject,
+  fetchResult,
+  fetchResultContributors,
+} from "/lib/cristin/service";
 import { connect, type RepoConnection, type RepoNode } from "/lib/xp/node";
 import { progress } from "/lib/xp/task";
-import type { Person, Result, Project, Unit, Institution } from "/lib/cristin";
+import type { Person, Result, Project, Unit, Institution, ListOfResultContributors } from "/lib/cristin";
 import type { UpdateCristinRepoConfig } from "./update-cristin-repo-config";
 import type { CristinNode } from "/lib/cristin/utils/repos";
 import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
@@ -18,7 +26,8 @@ type CristinRepo =
   | typeof REPO_CRISTIN_RESULTS
   | typeof REPO_CRISTIN_PROJECTS
   | typeof REPO_CRISTIN_UNITS
-  | typeof REPO_CRISTIN_INSTITUTIONS;
+  | typeof REPO_CRISTIN_INSTITUTIONS
+  | typeof REPO_CRISTIN_RESULT_CONTRIBUTORS;
 
 interface CristinRepoDataMap {
   [REPO_CRISTIN_PERSONS]: Person;
@@ -26,6 +35,7 @@ interface CristinRepoDataMap {
   [REPO_CRISTIN_PROJECTS]: Project;
   [REPO_CRISTIN_UNITS]: Unit;
   [REPO_CRISTIN_INSTITUTIONS]: Institution;
+  [REPO_CRISTIN_RESULT_CONTRIBUTORS]: ListOfResultContributors;
 }
 
 type UpdateResult = [changed: number, unchanged: number];
@@ -84,6 +94,8 @@ function fetchData<Repo extends CristinRepo, Data extends CristinRepoDataMap[Rep
     return fetchProject({ id }) as unknown as Data;
   } else if (repo === REPO_CRISTIN_RESULTS) {
     return fetchResult({ id }) as unknown as Data;
+  } else if (repo === REPO_CRISTIN_RESULT_CONTRIBUTORS) {
+    return fetchResultContributors({ id }) as unknown as Data;
   }
 }
 

@@ -10,6 +10,7 @@
         <option value="no.item.cristin.projects">REPO_CRISTIN_PROJECTS</option>
         <option value="no.item.cristin.results">REPO_CRISTIN_RESULTS</option>
         <option value="no.item.cristin.units">REPO_CRISTIN_UNITS</option>
+        <option value="no.item.cristin.resultcontributors">REPO_CRISTIN_RESULT_CONTRIBUTORS</option>
       </config>
     </input>
   </form>

@@ -11,7 +11,7 @@ import {
 import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
 import type { UpdateCristinRepoConfig } from "./tasks/update-cristin-repo/update-cristin-repo-config";
-import { ImportCristinResultRepoConfig } from "./tasks/import-cristin-result-repo/import-cristin-result-repo-config";
+import type { ImportCristinResultRepoConfig } from "./tasks/import-cristin-result-repo/import-cristin-result-repo-config";
 
 runAsSu(() => {
   // ensure repos exist
@@ -26,34 +26,32 @@ runAsSu(() => {
     {
       name: "import-persons",
       enabled: true,
-      config: {
-        repo: REPO_CRISTIN_PERSONS,
-      },
+      repo: REPO_CRISTIN_PERSONS,
       cron: "30 0 * * *", // 00:30
     },
     {
       name: "import-institutions",
       enabled: true,
-      config: {
-        repo: REPO_CRISTIN_INSTITUTIONS,
-      },
+      repo: REPO_CRISTIN_INSTITUTIONS,
       cron: "0 1 * * *", // 01:00
     },
     {
       name: "import-projects",
       enabled: true,
-      config: {
-        repo: REPO_CRISTIN_PROJECTS,
-      },
+      repo: REPO_CRISTIN_PROJECTS,
       cron: "30 1 * * *", // 01:30
     },
     {
       name: "import-units",
       enabled: true,
-      config: {
-        repo: REPO_CRISTIN_UNITS,
-      },
+      repo: REPO_CRISTIN_UNITS,
       cron: "0 2 * * *", // 02:00
+    },
+    {
+      name: "import-result-contributors",
+      enabled: true,
+      repo: REPO_CRISTIN_RESULT_CONTRIBUTORS,
+      cron: "30 2 * * *", // 02:30
     },
   ];
 
@@ -91,28 +89,31 @@ runAsSu(() => {
   }
 });
 
-function setupJob(params: SetupJobParams): void {
-  upsertScheduledJob({
-    description: `Update Cristin Repo "${params.config?.repo}"`,
+function setupJob({ cron, repo, enabled, name }: SetupJobParams): void {
+  upsertScheduledJob<UpdateCristinRepoConfig>({
+    description: `Update Cristin Repo "${repo}"`,
     descriptor: "no.item.cristin:update-cristin-repo",
     schedule: {
       type: "CRON",
-      value: params.cron,
+      value: cron,
       timeZone: "GMT+1:00",
     },
     user: "user:system:su",
-    ...params,
+    config: { repo },
+    enabled,
+    name,
   });
 }
 
 function upsertScheduledJob<Config>(params: CreateScheduledJobParams<Config>): ScheduledJob<Config> {
   const job =
     get(params) === null
-      ? create(params)
-      : modify({
+      ? create<Config>(params)
+      : modify<Config>({
           name: params.name,
           editor: (scheduledJob) => ({
             ...scheduledJob,
+            config: params.config!,
             description: params.description,
             descriptor: params.descriptor,
             schedule: params.schedule,
@@ -130,9 +131,12 @@ function upsertScheduledJob<Config>(params: CreateScheduledJobParams<Config>): S
   return job;
 }
 
-type SetupJobParams = Pick<CreateScheduledJobParams<UpdateCristinRepoConfig>, "name" | "enabled" | "config"> & {
+interface SetupJobParams {
+  name: string;
+  enabled: boolean;
+  repo: UpdateCristinRepoConfig["repo"];
   cron: string;
-};
+}
 
 function formatCronValue(cron: string): string {
   const [minutes, hours] = cron.split(" ");
