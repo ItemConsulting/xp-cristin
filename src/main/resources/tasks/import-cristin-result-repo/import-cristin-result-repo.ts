@@ -8,6 +8,11 @@ import { connect } from "/lib/xp/node";
 export const REPO_CRISTIN_RESULTS = "no.item.cristin.results";
 
 export function run({ institution }: ImportCristinResultRepoConfig): void {
+  if (!institution) {
+    log.error(`No institution specified for "import-cristin-result-repo"`);
+    return;
+  }
+
   importToRepo({
     repoName: REPO_CRISTIN_RESULTS,
     fetchList: () => fetchAllResults(institution),
