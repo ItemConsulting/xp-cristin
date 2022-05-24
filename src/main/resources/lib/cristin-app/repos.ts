@@ -9,6 +9,7 @@ export interface CristinNode<Data> {
   _name: string;
   data: Data;
   topics: Array<string>;
+  queryParams?: Record<string, string>;
 }
 
 export const UPSERT_RESULT_IDENTITY: UpsertResult = [0, 0, 0, 0];
@@ -23,6 +24,7 @@ export interface ImportToRepoParams<DataList extends Array<unknown>, DataSingle>
   fetchOne?: (id: string, current?: number, total?: number) => DataSingle;
   parseId: (obj: Unarray<DataList>) => string;
   progress?: (params: Partial<ProgressParams>) => void;
+  queryParams?: Record<string, string>;
 }
 
 export function importToRepo<DataList extends Array<unknown>, DataSingle>({
@@ -31,6 +33,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   parseId,
   fetchOne,
   progress,
+  queryParams,
 }: ImportToRepoParams<DataList, DataSingle>): void {
   const connection = connect({
     repoId: repoName,
@@ -55,6 +58,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
             _name: id,
             data: fetchOne ? fetchOne(id) : entry,
             topics: [],
+            queryParams,
           });
         } catch (e) {
           return NODE_ERROR;
@@ -87,6 +91,7 @@ function upsert<Data>(connection: RepoConnection, cristinNode: CristinNode<Data>
       key: node.id,
       editor: (node) => {
         node.data = cristinNode.data;
+        node.queryParams = cristinNode.queryParams;
         return node;
       },
     });

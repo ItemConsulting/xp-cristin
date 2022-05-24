@@ -18,6 +18,9 @@ export function run({ institution }: ImportCristinResultRepoConfig): void {
     fetchList: () => fetchAllResults(institution),
     parseId: (result) => String(result.cristin_result_id),
     progress,
+    queryParams: {
+      institution,
+    },
   });
 
   // refresh the indexes
