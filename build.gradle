@@ -24,7 +24,7 @@ dependencies {
   include "com.enonic.xp:lib-task:${xpVersion}"
   include "com.enonic.xp:lib-scheduler:${xpVersion}"
   include "com.enonic.lib:lib-http-client:3.0.1"
-  include "no.item:lib-xp-cristin:1.0.10"
+  include "no.item:lib-xp-cristin:1.0.11"
 }
 
 repositories {
