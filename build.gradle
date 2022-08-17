@@ -1,5 +1,6 @@
 plugins {
   id 'java'
+  id 'maven-publish'
   id "com.github.node-gradle.node" version '3.1.1'
   id 'com.enonic.xp.app' version '3.1.0'
   id 'no.item.xp.codegen' version '1.1.9'
@@ -24,7 +25,7 @@ dependencies {
   include "com.enonic.xp:lib-task:${xpVersion}"
   include "com.enonic.xp:lib-scheduler:${xpVersion}"
   include "com.enonic.lib:lib-http-client:3.1.0"
-  include "no.item:lib-xp-cristin:1.0.13"
+  include "no.item:lib-xp-cristin:1.0.15"
 }
 
 repositories {
@@ -99,4 +100,15 @@ def nodeEnvironment() {
   def environments = [prod: 'production', dev: 'development']
   def nodeEnv = environments[hasProperty('env') ? env : 'prod']
   return nodeEnv != null ? nodeEnv : 'production'
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+      groupId group
+      artifactId projectName
+      version version
+    }
+  }
 }
