@@ -7,6 +7,8 @@ a relation between data in Cristin with content in XP.
 
  > **Note** You can use [lib-xp-cristin](https://github.com/ItemConsulting/lib-xp-cristin) in your application to 
  > interact with data from Cristin in **your** application.
+ 
+[![](https://jitpack.io/v/no.item/xp-cristin.svg)](https://jitpack.io/#no.item/xp-cristin)
 
 <img src="https://github.com/ItemConsulting/xp-cristin/raw/main/docs/icon.svg?sanitize=true" width="150">
 
@@ -171,3 +173,7 @@ Deploy locally for testing purposes:
 ```bash
 enonic project deploy
 ```
+
+## Deploy to Jitpack
+
+Go to the [Jitpack page for xp-cristin](https://jitpack.io/#no.item/xp-cristin) to deploy from Github.
