@@ -1,4 +1,4 @@
-# Cristin integration for XP
+# Cristin application for XP
 
 [Cristin](https://www.cristin.no) is a service that gathers and makes available information about Norwegian research.
 

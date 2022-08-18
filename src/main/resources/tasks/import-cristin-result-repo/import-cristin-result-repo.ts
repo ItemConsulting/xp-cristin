@@ -1,13 +1,13 @@
 import { importToRepo } from "/lib/cristin-app/repos";
 import { fetchResults } from "/lib/cristin/service";
 import { progress } from "/lib/xp/task";
-import { ImportCristinResultRepoConfig } from "./import-cristin-result-repo-config";
+import { ImportCristinResultRepo } from ".";
 import { ListOfResults } from "/lib/cristin";
 import { connect } from "/lib/xp/node";
 
 export const REPO_CRISTIN_RESULTS = "no.item.cristin.results";
 
-export function run({ institution }: ImportCristinResultRepoConfig): void {
+export function run({ institution }: ImportCristinResultRepo): void {
   if (!institution) {
     log.error(`No institution specified for "import-cristin-result-repo"`);
     return;

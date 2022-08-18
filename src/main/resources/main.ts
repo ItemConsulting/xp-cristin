@@ -10,8 +10,8 @@ import {
 } from "/lib/cristin/constants";
 import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
-import type { UpdateCristinRepoConfig } from "./tasks/update-cristin-repo/update-cristin-repo-config";
-import type { ImportCristinResultRepoConfig } from "./tasks/import-cristin-result-repo/import-cristin-result-repo-config";
+import type { UpdateCristinRepo } from "./tasks/update-cristin-repo";
+import type { ImportCristinResultRepo } from "./tasks/import-cristin-result-repo";
 
 runAsSu(() => {
   // ensure repos exist
@@ -79,7 +79,7 @@ runAsSu(() => {
     const resultsRepoExisted = ensureRepoExist(REPO_CRISTIN_RESULTS);
 
     if (!resultsRepoExisted) {
-      submitTask<ImportCristinResultRepoConfig>({
+      submitTask<ImportCristinResultRepo>({
         descriptor: "no.item.cristin:import-cristin-result-repo",
         config: {
           institution: app.config.institution,
@@ -90,7 +90,7 @@ runAsSu(() => {
 });
 
 function setupJob({ cron, repo, enabled, name }: SetupJobParams): void {
-  upsertScheduledJob<UpdateCristinRepoConfig>({
+  upsertScheduledJob<UpdateCristinRepo>({
     description: `Update Cristin Repo "${repo}"`,
     descriptor: "no.item.cristin:update-cristin-repo",
     schedule: {
@@ -134,7 +134,7 @@ function upsertScheduledJob<Config>(params: CreateScheduledJobParams<Config>): S
 interface SetupJobParams {
   name: string;
   enabled: boolean;
-  repo: UpdateCristinRepoConfig["repo"];
+  repo: UpdateCristinRepo["repo"];
   cron: string;
 }
 

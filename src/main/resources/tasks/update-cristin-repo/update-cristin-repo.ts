@@ -17,7 +17,7 @@ import {
 import { connect, type RepoConnection, type RepoNode } from "/lib/xp/node";
 import { progress } from "/lib/xp/task";
 import type { Person, Result, Project, Unit, Institution, ListOfResultContributors } from "/lib/cristin";
-import type { UpdateCristinRepoConfig } from "./update-cristin-repo-config";
+import type { UpdateCristinRepo } from ".";
 import type { CristinNode } from "/lib/cristin/utils/repos";
 import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
 
@@ -43,7 +43,7 @@ type UpdateResult = [changed: number, unchanged: number];
 const INITIAL_UPDATE_RESULT: UpdateResult = [0, 0];
 
 export function run<
-  Repo extends UpdateCristinRepoConfig["repo"],
+  Repo extends UpdateCristinRepo["repo"],
   Data extends CristinRepoDataMap[Repo] = CristinRepoDataMap[Repo]
 >({ repo }: { repo: Repo }): void {
   log.info(`Start updating repo "${repo}"`);
