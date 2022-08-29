@@ -121,14 +121,7 @@ function getAllEntriesFromRepo<Data>(connection: RepoConnection): Array<CristinN
 }
 
 function hasChanged<T>(x: T, y: T): boolean {
-  const cha = prepareForComparison(x) !== prepareForComparison(y);
-
-  if (cha) {
-    log.info(prepareForComparison(x));
-    log.info(prepareForComparison(y));
-  }
-
-  return cha;
+  return prepareForComparison(x) !== prepareForComparison(y);
 }
 
 /**
