@@ -1,7 +1,7 @@
-import { connect, type RepoConnection, type NodeQueryHit } from "/lib/xp/node";
-import type { ProgressParams } from "/lib/xp/task";
-import type { Unarray } from "enonic-types/types";
+import { connect, type RepoConnection, type NodeQueryResultHit } from "/lib/xp/node";
+import type { TaskProgressParams } from "/lib/xp/task";
 import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
+import { Unarray } from "/lib/cristin";
 
 export type UpsertResult = [created: number, modified: number, unchanged: number, error: number];
 
@@ -23,7 +23,7 @@ export interface ImportToRepoParams<DataList extends Array<unknown>, DataSingle>
   fetchList: () => DataList;
   fetchOne?: (id: string, current?: number, total?: number) => DataSingle;
   parseId: (obj: Unarray<DataList>) => string;
-  progress?: (params: Partial<ProgressParams>) => void;
+  progress?: (params: Partial<TaskProgressParams>) => void;
   queryParams?: Record<string, string>;
 }
 
@@ -113,14 +113,14 @@ function hasDataContentsChanged<Data>(
 ): boolean {
   const currentNode = connection.get<CristinNode<Data>>(nodeId);
 
-  return prepareForComparison(currentNode.data) !== prepareForComparison(cristinNode.data);
+  return prepareForComparison(currentNode?.data) !== prepareForComparison(cristinNode.data);
 }
 
 function prepareForComparison(obj: unknown): string {
   return JSON.stringify(obj).replace(/]|[[]/g, "");
 }
 
-function getNodeByDataId(connection: RepoConnection, id: string): NodeQueryHit | undefined {
+function getNodeByDataId(connection: RepoConnection, id: string): NodeQueryResultHit | undefined {
   return connection.query({
     count: 1,
     filters: {

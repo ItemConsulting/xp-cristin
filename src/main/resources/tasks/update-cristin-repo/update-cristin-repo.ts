@@ -14,12 +14,13 @@ import {
   fetchResult,
   fetchResultContributors,
 } from "/lib/cristin/service";
-import { connect, type RepoConnection, type RepoNode } from "/lib/xp/node";
+import { connect, type RepoConnection, type Node } from "/lib/xp/node";
 import { progress } from "/lib/xp/task";
 import type { Person, Result, Project, Unit, Institution, ListOfResultContributors } from "/lib/cristin";
 import type { UpdateCristinRepo } from ".";
 import type { CristinNode } from "/lib/cristin/utils/repos";
 import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
+import { notNullOrUndefined } from "/lib/cristin-app/utils";
 
 type CristinRepo =
   | typeof REPO_CRISTIN_PERSONS
@@ -103,7 +104,7 @@ function updateCounter([changed, unchanged]: UpdateResult, contentHasChanged: bo
   return contentHasChanged ? [changed + 1, unchanged] : [changed, unchanged + 1];
 }
 
-function getAllEntriesFromRepo<Data>(connection: RepoConnection): Array<CristinNode<Data> & RepoNode> {
+function getAllEntriesFromRepo<Data>(connection: RepoConnection): Array<Node<CristinNode<Data>>> {
   const res = connection.query({
     count: 20000,
     filters: {
@@ -117,7 +118,7 @@ function getAllEntriesFromRepo<Data>(connection: RepoConnection): Array<CristinN
     },
   });
 
-  return res.hits.map((hit) => connection.get<CristinNode<Data>>(hit.id));
+  return res.hits.map((hit) => connection.get<CristinNode<Data>>(hit.id)).filter(notNullOrUndefined);
 }
 
 function hasChanged<T>(x: T, y: T): boolean {

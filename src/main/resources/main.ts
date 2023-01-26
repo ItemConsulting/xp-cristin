@@ -105,7 +105,7 @@ function setupJob({ cron, repo, enabled, name }: SetupJobParams): void {
   });
 }
 
-function upsertScheduledJob<Config>(params: CreateScheduledJobParams<Config>): ScheduledJob<Config> {
+function upsertScheduledJob<Config extends object>(params: CreateScheduledJobParams<Config>): ScheduledJob<Config> {
   const job =
     get(params) === null
       ? create<Config>(params)
@@ -113,7 +113,7 @@ function upsertScheduledJob<Config>(params: CreateScheduledJobParams<Config>): S
           name: params.name,
           editor: (scheduledJob) => ({
             ...scheduledJob,
-            config: params.config!,
+            config: params.config,
             description: params.description,
             descriptor: params.descriptor,
             schedule: params.schedule,

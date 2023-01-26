@@ -1,6 +1,5 @@
-import { getCristinResults, type ListOfResults } from "/lib/cristin";
+import { getCristinResults, type ListOfResults, type Unarray } from "/lib/cristin";
 import { fetchResults } from "/lib/cristin/service";
-import { Unarray } from "enonic-types/types";
 import { notNullOrUndefined } from "/lib/cristin-app/utils";
 import { getCristinPagination, isNumber } from "/lib/cristin-app/custom-selectors";
 

@@ -1,6 +1,8 @@
-import { fetchResultCategories, type CristinResultCategory } from "/lib/cristin/service";
-import { notNullOrUndefined } from "/lib/cristin-app/utils";
+import { fetchResultCategories } from "/lib/cristin/service";
 import { getLocalized } from "/lib/cristin-app/custom-selectors";
+import type { Result } from "/lib/cristin";
+
+type CristinResultCategory = NonNullable<Result["category"]>;
 
 export function get(req: XP.CustomSelectorServiceRequest): XP.CustomSelectorServiceResponse {
   const { count, total, data } = fetchResultCategories();
@@ -12,15 +14,20 @@ export function get(req: XP.CustomSelectorServiceRequest): XP.CustomSelectorServ
       count,
       total,
       hits: data
-        .filter((category) => (query ? categoryMatchesQuery(category, query) : true))
+        .filter((category) => (query && category ? categoryMatchesQuery(category, query) : true))
+        .filter(isCategory)
         .map((category) => ({
           id: category.code ?? String(category.name),
           displayName: getLocalized(category.name),
           description: category.code,
-        }))
-        .filter(notNullOrUndefined),
+        })),
     },
   };
+}
+
+function isCategory(value: unknown): value is CristinResultCategory {
+  const category = value as CristinResultCategory;
+  return category !== undefined && category.code !== undefined && category.name !== undefined;
 }
 
 function categoryMatchesQuery(category: CristinResultCategory, query: string): boolean {
