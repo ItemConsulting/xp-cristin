@@ -1,16 +1,32 @@
 import { connect, type RepoConnection, type NodeQueryResultHit } from "/lib/xp/node";
 import type { TaskProgressParams } from "/lib/xp/task";
 import { BRANCH_MASTER } from "/lib/cristin-app/contexts";
+import {
+  REPO_CRISTIN_PERSONS,
+  REPO_CRISTIN_RESULTS,
+  REPO_CRISTIN_PROJECTS,
+  REPO_CRISTIN_UNITS,
+  REPO_CRISTIN_INSTITUTIONS,
+  REPO_CRISTIN_RESULT_CONTRIBUTORS,
+  TYPE_CRISTIN_INSTITUTION,
+  TYPE_CRISTIN_PERSON,
+  TYPE_CRISTIN_PROJECT,
+  TYPE_CRISTIN_RESULT,
+  TYPE_CRISTIN_RESULT_CONTRIBUTOR,
+  TYPE_CRISTIN_UNIT,
+} from "/lib/cristin/constants";
 import { Unarray } from "/lib/cristin";
+import { CristinNode } from "/lib/cristin/utils/repos";
+
+type REPO_NAMES =
+  | typeof REPO_CRISTIN_PERSONS
+  | typeof REPO_CRISTIN_RESULTS
+  | typeof REPO_CRISTIN_PROJECTS
+  | typeof REPO_CRISTIN_UNITS
+  | typeof REPO_CRISTIN_INSTITUTIONS
+  | typeof REPO_CRISTIN_RESULT_CONTRIBUTORS;
 
 export type UpsertResult = [created: number, modified: number, unchanged: number, error: number];
-
-export interface CristinNode<Data> {
-  _name: string;
-  data: Data;
-  topics: Array<string>;
-  queryParams?: Record<string, string>;
-}
 
 export const UPSERT_RESULT_IDENTITY: UpsertResult = [0, 0, 0, 0];
 export const NODE_CREATED: UpsertResult = [1, 0, 0, 0];
@@ -18,8 +34,17 @@ export const NODE_MODIFIED: UpsertResult = [0, 1, 0, 0];
 export const NODE_UNCHANGED: UpsertResult = [0, 0, 1, 0];
 export const NODE_ERROR: UpsertResult = [0, 0, 0, 1];
 
+export const REPO_TO_TYPE = {
+  [REPO_CRISTIN_PERSONS]: TYPE_CRISTIN_PERSON,
+  [REPO_CRISTIN_RESULTS]: TYPE_CRISTIN_RESULT,
+  [REPO_CRISTIN_PROJECTS]: TYPE_CRISTIN_PROJECT,
+  [REPO_CRISTIN_UNITS]: TYPE_CRISTIN_UNIT,
+  [REPO_CRISTIN_INSTITUTIONS]: TYPE_CRISTIN_INSTITUTION,
+  [REPO_CRISTIN_RESULT_CONTRIBUTORS]: TYPE_CRISTIN_RESULT_CONTRIBUTOR,
+};
+
 export interface ImportToRepoParams<DataList extends Array<unknown>, DataSingle> {
-  repoName: string;
+  repoName: REPO_NAMES;
   fetchList: () => DataList;
   fetchOne?: (id: string, current?: number, total?: number) => DataSingle;
   parseId: (obj: Unarray<DataList>) => string;
@@ -33,7 +58,6 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   parseId,
   fetchOne,
   progress,
-  queryParams,
 }: ImportToRepoParams<DataList, DataSingle>): void {
   const connection = connect({
     repoId: repoName,
@@ -56,9 +80,8 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
 
           return upsert(connection, {
             _name: id,
+            type: REPO_TO_TYPE[repoName],
             data: fetchOne ? fetchOne(id) : entry,
-            topics: [],
-            queryParams,
           });
         } catch (e) {
           return NODE_ERROR;
@@ -74,11 +97,11 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   }
 }
 
-function upsert<Data>(connection: RepoConnection, cristinNode: CristinNode<Data>): UpsertResult {
+function upsert<Hit extends CristinNode<unknown, string>>(connection: RepoConnection, cristinNode: Hit): UpsertResult {
   const node = getNodeByDataId(connection, cristinNode._name);
 
   if (node === undefined) {
-    connection.create<CristinNode<Data>>({
+    connection.create<Hit>({
       _indexConfig: {
         default: "fulltext",
       },
@@ -87,11 +110,10 @@ function upsert<Data>(connection: RepoConnection, cristinNode: CristinNode<Data>
 
     return NODE_CREATED;
   } else if (hasDataContentsChanged(connection, node.id, cristinNode)) {
-    connection.modify<CristinNode<Data>>({
+    connection.modify<Hit>({
       key: node.id,
       editor: (node) => {
         node.data = cristinNode.data;
-        node.queryParams = cristinNode.queryParams;
         return node;
       },
     });
@@ -106,12 +128,12 @@ function concatUpsertResults(a: UpsertResult, b: UpsertResult): UpsertResult {
   return [a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]];
 }
 
-function hasDataContentsChanged<Data>(
+function hasDataContentsChanged<Hit extends CristinNode<unknown, string>>(
   connection: RepoConnection,
   nodeId: string,
-  cristinNode: CristinNode<Data>
+  cristinNode: Hit
 ): boolean {
-  const currentNode = connection.get<CristinNode<Data>>(nodeId);
+  const currentNode = connection.get<Hit>(nodeId);
 
   return prepareForComparison(currentNode?.data) !== prepareForComparison(cristinNode.data);
 }

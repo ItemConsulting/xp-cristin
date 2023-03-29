@@ -10,8 +10,23 @@ import {
 } from "/lib/cristin/constants";
 import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
-import type { UpdateCristinRepo } from "./tasks/update-cristin-repo";
-import type { ImportCristinResultRepo } from "./tasks/import-cristin-result-repo";
+
+type ImportCristinResultRepo = {
+  institution: string;
+};
+
+type UpdateCristinRepo = {
+  /**
+   * Name of repository
+   */
+  repo:
+    | "no.item.cristin.institutions"
+    | "no.item.cristin.persons"
+    | "no.item.cristin.projects"
+    | "no.item.cristin.results"
+    | "no.item.cristin.units"
+    | "no.item.cristin.resultcontributors";
+};
 
 runAsSu(() => {
   // ensure repos exist
@@ -105,7 +120,9 @@ function setupJob({ cron, repo, enabled, name }: SetupJobParams): void {
   });
 }
 
-function upsertScheduledJob<Config extends object>(params: CreateScheduledJobParams<Config>): ScheduledJob<Config> {
+function upsertScheduledJob<Config extends Record<string, unknown>>(
+  params: CreateScheduledJobParams<Config>
+): ScheduledJob<Config> {
   const job =
     get(params) === null
       ? create<Config>(params)

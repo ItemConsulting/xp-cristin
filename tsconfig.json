@@ -17,7 +17,8 @@
     "paths": {
       "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
       "/lib/*": [ "./node_modules/@item-enonic-types/lib-*" ,"./src/main/resources/lib/*"],
-      "/site/*": ["./.xp-codegen/site/*"]
+      "/site/*": ["./.xp-codegen/site/*"],
+      "/tasks/*": ["./.xp-codegen/tasks/*"]
     }
   },
   "include": [

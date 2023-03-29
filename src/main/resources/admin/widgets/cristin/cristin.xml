@@ -1,0 +1,11 @@
+<widget>
+  <display-name>Cristin</display-name>
+  <description>Trigger import tasks</description>
+  <interfaces>
+    <interface>contentstudio.contextpanel</interface>
+  </interfaces>
+  <allow>
+    <principal>role:system.admin</principal>
+  </allow>
+</widget>
+
