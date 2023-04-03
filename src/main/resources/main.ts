@@ -10,7 +10,6 @@ import {
 } from "/lib/cristin/constants";
 import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
-import {notNullOrUndefined} from "/lib/cristin-app/utils";
 
 type ImportCristinResultRepo = {
   institution: string;
