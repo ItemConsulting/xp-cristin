@@ -21,6 +21,11 @@ This application is intended to cache data for **one organization**, which is sp
  > institution=<my-institution-number>
  > ```
 
+You may add an optional configuration to your config file, which will disable a scheduled job of type `"import-result-contributors"`.
+Default behaviour is enabled:
+```ini
+importResultContributors=disabled
+```
 
 ## Using local copies of the Cristin data
 
