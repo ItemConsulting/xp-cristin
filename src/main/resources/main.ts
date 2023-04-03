@@ -65,7 +65,7 @@ runAsSu(() => {
     },
     {
       name: "import-result-contributors",
-      enabled: !notNullOrUndefined(app.config.contributors),
+      enabled: app.config.importResultContributors !== "disabled",
       repo: REPO_CRISTIN_RESULT_CONTRIBUTORS,
       cron: "30 2 * * *", // 02:30
     },
