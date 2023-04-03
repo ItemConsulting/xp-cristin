@@ -17,6 +17,7 @@ import {
 } from "/lib/cristin/constants";
 import { Unarray } from "/lib/cristin";
 import { CristinNode } from "/lib/cristin/utils/repos";
+import { send } from "/lib/xp/event";
 
 type REPO_NAMES =
   | typeof REPO_CRISTIN_PERSONS
@@ -107,6 +108,13 @@ function upsert<Hit extends CristinNode<unknown, string>>(connection: RepoConnec
       },
       ...cristinNode,
     });
+
+    if(cristinNode.type === TYPE_CRISTIN_RESULT) {
+      send({
+        type: "cristin.result.create",
+        data: cristinNode,
+      });
+    }
 
     return NODE_CREATED;
   } else if (hasDataContentsChanged(connection, node.id, cristinNode)) {

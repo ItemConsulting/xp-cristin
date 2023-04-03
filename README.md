@@ -105,6 +105,22 @@ This CustomSelector-service can be used to create a filter in a part that return
 </input>
 ```
 
+## Events
+
+Events that can be emitted from this library:
+
+- `custom.cristin.result.create`
+
+*In Enonic XP you may listen to the events emitted from this library by defining a `listener: *
+```typescript
+listener<CristinNode & Node>({
+  type: "custom.cristin.result.*",
+  callback: (event) => {
+    // Handle event
+  },
+});
+```
+
 ## What do I use all these Cristin IDs for?
 
 You can use [lib-xp-cristin](https://github.com/ItemConsulting/lib-xp-cristin) in your application to fetch the data 
