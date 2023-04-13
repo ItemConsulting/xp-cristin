@@ -7,6 +7,7 @@ import {
   REPO_CRISTIN_RESULT_CONTRIBUTORS,
   REPO_CRISTIN_INSTITUTIONS,
   REPO_CRISTIN_UNITS,
+  REPO_CRISTIN_FUNDING,
 } from "/lib/cristin/constants";
 import { ensureRepoExist } from "/lib/cristin/utils/repos";
 import { runAsSu } from "/lib/cristin-app/contexts";
@@ -25,7 +26,8 @@ type UpdateCristinRepo = {
     | "no.item.cristin.projects"
     | "no.item.cristin.results"
     | "no.item.cristin.units"
-    | "no.item.cristin.resultcontributors";
+    | "no.item.cristin.resultcontributors"
+    | "no.item.cristin.fundings";
 };
 
 runAsSu(() => {
@@ -35,6 +37,7 @@ runAsSu(() => {
   ensureRepoExist(REPO_CRISTIN_INSTITUTIONS);
   ensureRepoExist(REPO_CRISTIN_UNITS);
   ensureRepoExist(REPO_CRISTIN_RESULT_CONTRIBUTORS);
+  ensureRepoExist(REPO_CRISTIN_FUNDING);
 
   // Setup nightly import jobs
   const jobs: Array<SetupJobParams> = [
@@ -67,6 +70,12 @@ runAsSu(() => {
       enabled: app.config.importResultContributors !== "disabled",
       repo: REPO_CRISTIN_RESULT_CONTRIBUTORS,
       cron: "30 2 * * *", // 02:30
+    },
+    {
+      name: "import-result-funding",
+      enabled: true,
+      repo: REPO_CRISTIN_FUNDING,
+      cron: "30 3 * * *", // 03:30
     },
   ];
 

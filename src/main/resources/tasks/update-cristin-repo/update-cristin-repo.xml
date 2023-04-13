@@ -11,6 +11,7 @@
         <option value="no.item.cristin.results">REPO_CRISTIN_RESULTS</option>
         <option value="no.item.cristin.units">REPO_CRISTIN_UNITS</option>
         <option value="no.item.cristin.resultcontributors">REPO_CRISTIN_RESULT_CONTRIBUTORS</option>
+        <option value="no.item.cristin.fundings">REPO_CRISTIN_FUNDINGS</option>
       </config>
     </input>
   </form>
