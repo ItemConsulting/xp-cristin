@@ -56,15 +56,34 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
   const nodes = getAllEntriesFromRepo<Hit>(connection);
 
   const [changed, unchanged] = nodes.reduce<UpdateResult>((counter, cristinNode, current) => {
-    const freshContent = fetchData<Repo, Hit["data"]>(repo, cristinNode._name);
+    let freshContent = undefined;
+    let markAsDeleted = false;
 
-    const contentHasChanged = hasChanged(cristinNode.data, freshContent);
+    try {
+      freshContent = fetchData<Repo, Hit["data"]>(repo, cristinNode._name);
+    }
+    catch(e) {
+      markAsDeleted = e.message.match(/status: 404/g).length > 0;
+    }
+
+    const contentHasChanged = freshContent ? hasChanged(cristinNode.data, freshContent) : false;
 
     if (contentHasChanged) {
       connection.modify<Hit>({
         key: cristinNode._id,
         editor: (node) => {
           node.data = cristinNode.data;
+          return node;
+        },
+      });
+    }
+
+    // When earlier results imported is removed from cristin, mark these as removed
+    if(!freshContent && markAsDeleted) {
+      connection.modify<Hit & {removedFromCristin: boolean}>({
+        key: cristinNode._id,
+        editor: (node) => {
+          node.removedFromCristin = true;
           return node;
         },
       });
@@ -78,7 +97,8 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
 
     return updateCounter(counter, contentHasChanged);
   }, INITIAL_UPDATE_RESULT);
-
+  // refresh the indexes
+  connection.refresh("ALL");
   log.info(`Updated repo "${repo}" with ${changed} changes and ${unchanged} unchanged`);
 }
 
@@ -112,14 +132,22 @@ function getAllEntriesFromRepo<Hit extends CristinNode<unknown, string>>(connect
     count: 20000,
     filters: {
       boolean: {
-        mustNot: {
+        mustNot: [
+          {
           ids: {
             values: ["000-000-000-000"],
           },
+
         },
+        {
+          hasValue: {
+            field: "removedFromCristin",
+            values: [true]
+          }
+        }
+      ],
       },
-    },
-  });
+  }});
 
   return res.hits.map((hit) => connection.get<Hit>(hit.id)).filter(notNullOrUndefined);
 }
