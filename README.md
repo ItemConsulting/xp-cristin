@@ -32,7 +32,23 @@ importResultContributors=disabled
 We want to display data from Cristin on our XP site, and to make it quick, searchable and robust copies of data from the
 API is stored in local [repos (Elastic Search Databases)](https://developer.enonic.com/docs/xp/stable/api/lib-repo) in XP.
 
-Upon installation of this application – and then on a nightly schedule – data from Cristin is copied into the local repositories
+Upon installation of this application – and then on a nightly schedule – data from Cristin is copied into the local repositories.
+
+### Manual import
+
+You can trigger a manual import using the `import-all` service:
+
+- **Default** (persons only): `GET /api/import-all`
+- **Specific repo**: `GET /api/import-all?repo=no.item.cristin.results`
+- **All repos**: `GET /api/import-all?all=true`
+
+Valid `repo` values match the repo names listed below.
+
+### Error handling
+
+The import task handles errors gracefully – if a single entry fails to fetch (e.g. 403 or network error), the task logs a warning and continues with the remaining entries. Entries returning 404 are marked as `removedFromCristin` and excluded from future imports.
+
+### Repos
 
 The follow repos are created:
 - `"no.item.cristin.persons"`

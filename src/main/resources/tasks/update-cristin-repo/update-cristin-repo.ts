@@ -61,9 +61,14 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
 
     try {
       freshContent = fetchData<Repo, Hit["data"]>(repo, cristinNode._name);
-    }
-    catch(e) {
-      markAsDeleted = e.message.match(/status: 404/g).length > 0;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      const is404 = message.match(/status: 404/g);
+      markAsDeleted = is404 !== null;
+
+      if (!markAsDeleted) {
+        log.warning(`Failed to fetch ${cristinNode._name} from "${repo}": ${message}`);
+      }
     }
 
     const contentHasChanged = freshContent ? hasChanged(cristinNode.data, freshContent) : false;
@@ -79,8 +84,8 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
     }
 
     // When earlier results imported is removed from cristin, mark these as removed
-    if(!freshContent && markAsDeleted) {
-      connection.modify<Hit & {removedFromCristin: boolean}>({
+    if (!freshContent && markAsDeleted) {
+      connection.modify<Hit & { removedFromCristin: boolean }>({
         key: cristinNode._id,
         editor: (node) => {
           node.removedFromCristin = true;
@@ -134,20 +139,20 @@ function getAllEntriesFromRepo<Hit extends CristinNode<unknown, string>>(connect
       boolean: {
         mustNot: [
           {
-          ids: {
-            values: ["000-000-000-000"],
+            ids: {
+              values: ["000-000-000-000"],
+            },
           },
-
-        },
-        {
-          hasValue: {
-            field: "removedFromCristin",
-            values: [true]
-          }
-        }
-      ],
+          {
+            hasValue: {
+              field: "removedFromCristin",
+              values: [true],
+            },
+          },
+        ],
       },
-  }});
+    },
+  });
 
   return res.hits.map((hit) => connection.get<Hit>(hit.id)).filter(notNullOrUndefined);
 }
