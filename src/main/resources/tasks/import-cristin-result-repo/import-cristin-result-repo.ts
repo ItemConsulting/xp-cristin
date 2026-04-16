@@ -32,9 +32,9 @@ export function run({ institution }: ImportCristinResultRepo): void {
 
 function fetchAllResults(institution: string): ListOfResults {
   let results: ListOfResults = [];
-  const perPage = 1000;
+  const perPage = 500;
 
-  for (let page = 1; page < 20; page++) {
+  for (let page = 1; page < 40; page++) {
     const result = fetchResults({
       institution,
       page: page.toString(),

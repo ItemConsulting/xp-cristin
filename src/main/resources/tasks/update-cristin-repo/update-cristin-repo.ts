@@ -95,9 +95,9 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
     }
 
     progress({
-      current,
+      current: current + 1,
       total: nodes.length,
-      info: `Updated ${current} of ${nodes.length} entries in "${repo}"`,
+      info: `Updated ${current + 1} of ${nodes.length} entries in "${repo}"`,
     });
 
     return updateCounter(counter, contentHasChanged);
