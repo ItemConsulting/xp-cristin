@@ -77,7 +77,7 @@ export function run<Repo extends keyof CristinRepoDataMap, Hit extends CristinRe
       connection.modify<Hit>({
         key: cristinNode._id,
         editor: (node) => {
-          node.data = cristinNode.data;
+          node.data = freshContent as Hit["data"];
           return node;
         },
       });

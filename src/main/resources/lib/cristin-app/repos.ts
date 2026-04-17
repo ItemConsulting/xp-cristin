@@ -72,7 +72,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
         try {
           const id = parseId(entry);
 
-          if (progress && index % 10 === 0) {
+          if (progress && (index % 10 === 0 || index === all.length - 1)) {
             progress({
               current: index + 1,
               total: all.length,
