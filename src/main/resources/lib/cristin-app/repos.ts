@@ -16,12 +16,8 @@ import {
   TYPE_CRISTIN_UNIT,
 } from "/lib/cristin/constants";
 import { Unarray } from "/lib/cristin";
-import { type CristinNode as BaseCristinNode } from "/lib/cristin/utils/repos";
+import { CristinNode } from "/lib/cristin/utils/repos";
 import { send } from "/lib/xp/event";
-
-type CristinNode<Data, Type extends string> = BaseCristinNode<Data, Type> & {
-  queryParams?: Record<string, string>;
-};
 
 type REPO_NAMES =
   | typeof REPO_CRISTIN_PERSONS

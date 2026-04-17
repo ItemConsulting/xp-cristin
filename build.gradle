@@ -32,6 +32,10 @@ repositories {
   mavenLocal()
   mavenCentral()
   xp.enonicRepo()
+  maven {
+    name = "itemtestRepository"
+    url = uri("https://repo.itemtest.no/releases")
+  }
   maven { url 'https://jitpack.io' }
 }
 
