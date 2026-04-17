@@ -59,6 +59,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
   parseId,
   fetchOne,
   progress,
+  queryParams,
 }: ImportToRepoParams<DataList, DataSingle>): void {
   const connection = connect({
     repoId: repoName,
@@ -71,7 +72,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
         try {
           const id = parseId(entry);
 
-          if (progress && index % 10 === 0) {
+          if (progress && (index % 10 === 0 || index === all.length - 1)) {
             progress({
               current: index + 1,
               total: all.length,
@@ -83,6 +84,7 @@ export function importToRepo<DataList extends Array<unknown>, DataSingle>({
             _name: id,
             type: REPO_TO_TYPE[repoName],
             data: fetchOne ? fetchOne(id) : entry,
+            queryParams,
           });
         } catch (e) {
           return NODE_ERROR;
@@ -122,6 +124,7 @@ function upsert<Hit extends CristinNode<unknown, string>>(connection: RepoConnec
       key: node.id,
       editor: (node) => {
         node.data = cristinNode.data;
+        node.queryParams = cristinNode.queryParams;
         return node;
       },
     });
@@ -143,11 +146,14 @@ function hasDataContentsChanged<Hit extends CristinNode<unknown, string>>(
 ): boolean {
   const currentNode = connection.get<Hit>(nodeId);
 
-  return prepareForComparison(currentNode?.data) !== prepareForComparison(cristinNode.data);
+  return (
+    prepareForComparison(currentNode?.data) !== prepareForComparison(cristinNode.data) ||
+    prepareForComparison(currentNode?.queryParams) !== prepareForComparison(cristinNode.queryParams)
+  );
 }
 
 function prepareForComparison(obj: unknown): string {
-  return JSON.stringify(obj).replace(/]|[[]/g, "");
+  return (JSON.stringify(obj) ?? "").replace(/]|[[]/g, "");
 }
 
 function getNodeByDataId(connection: RepoConnection, id: string): NodeQueryResultHit | undefined {
